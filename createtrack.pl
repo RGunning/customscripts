@@ -1,4 +1,11 @@
 #!/usr/bin/env perl
+####################################################
+# Created By: Nic Walker (nw11@sanger.ac.uk)       #
+# Modified By: Richard Gunning (rg12@sanger.ac.uk  #
+#												   #
+####################################################
+
+
 # getopt
 # json
 # read the vocab file
