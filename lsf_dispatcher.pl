@@ -78,7 +78,7 @@ sub dispatch_lsf {
 	use Time::Stamp qw(-stamps);
 	use LSF RaiseError => 0, PrintError => 1, PrintOutput => 0;
 
-	my $job_manager = LSF::JobManager->new( -q => 'normal', -M => "500" ,-R => "span[hosts=1] select[mem>500] rusage[mem=500]" , -L => "/usr/local/bin/bash");#, -L => '/bin/bash' );
+	my $job_manager = LSF::JobManager->new( -q => 'normal', -M => "500" , -n => "1" , -R => "span[hosts=1] select[mem>500] rusage[mem=500]" , -L => "/usr/local/bin/bash");#, -L => '/bin/bash' );
 
 	my $timestamp = gmstamp();
 	foreach my $job_id (@$job_ids) {
