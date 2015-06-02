@@ -25,7 +25,7 @@ use JSON;
 use HTTP::Tiny;
 use Storable 'dclone';
 use List::AllUtils qw(uniq);
-#use Set::CrossProduct;
+use Set::CrossProduct;
 use Color::Scheme;
 
 #print STDERR Dumper \@ARGV;
