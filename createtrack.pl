@@ -30,25 +30,27 @@ use Color::Scheme;
 
 print STDERR Dumper \@ARGV;
 
-my( $file, $sexes, $assays,$url_names, $base_url, $help, $json_url, $cell_types, $url_suffix, $hmark, $strain, $repeat, $peak);
+my( $file, $sexes, $assays,$url_names, $base_url, $help, $json_url, $cell_types, $url_suffix, $hmark, $strain, $repeat, $peak, $methyl, $genes);
 my $name_suffix;
 my $colour_by = 'cell_types';
 my $type = 'bedgraph';
-GetOptions( "vocab_url=s"   => \$json_url,
-			"strain=s"		=> \$strain,
+GetOptions( "vocab_url=s"   	=> \$json_url,
+	    "strain=s"		=> \$strain,
             "sexes=s"    	=> \$sexes,
             "cell_types=s" 	=> \$cell_types,
             "assays=s"   	=> \$assays,
-            "hmark=s"		=>	\$hmark,
-            "url_names=s"   => \$url_names,
+            "hmark=s"		=> \$hmark,
+            "url_names=s"	=> \$url_names,
             "url_suffix=s" 	=> \$url_suffix,
-            "name_suffix=s" => \$name_suffix,
+            "name_suffix=s" 	=> \$name_suffix,
             "base_url=s" 	=> \$base_url,
             "colour_by=s" 	=> \$colour_by,
-            "type=s"        => \$type,
-            "repeat=s"		=> \$repeat,
+            "type=s"        	=> \$type,
+            "replicate=s"	=> \$repeat,
             "peak=s"		=> \$peak,
-            "help" => \$help
+            "methyl=s"		=> \$methyl,
+            "genes=s"		=> \$genes,
+            "help" 		=> \$help
             )
     or die("Error in command line arguments\n");
 
@@ -69,10 +71,12 @@ print $help_message;
 exit 0;
 }
 
-die "url_names not defined"       if ! defined($url_names);
-die "url_suffix not defined"       if ! defined($url_suffix);
-die "url_base not defined"   if ! defined($base_url);
-
+if( $type ne 'genelist'){
+	die "url_names not defined"       if ! defined($url_names);
+#	die "url_suffix not defined"       if ! defined($url_suffix);
+	die "url_base not defined"   if ! defined($base_url);
+	say "Setting url names and base url";
+}
 
 my @colour_by = split /\s/, $colour_by;
 
@@ -81,7 +85,10 @@ my @colour_by = split /\s/, $colour_by;
 # translate strings into arrays
 #my @properties;
 
-my @url_names = map { $_ . $url_suffix } split /\s/, $url_names;
+if( $type ne 'genelist'){
+	my @url_names = map { $_ . $url_suffix } split /\s/, $url_names;
+	say "url names -> array";
+}
 #push @properties, \@url_names;
 #foreach my $input (@inputs){
 #   my @input = split /\s/, $input;
@@ -91,9 +98,15 @@ my @url_names = map { $_ . $url_suffix } split /\s/, $url_names;
 print STDERR "Setting Properties:\n";
 
 # SET PROPERTY HASH BASED ON WHAT USER SUPLIES
-my %properties = (
-    url_names  	=>  \@url_names,
-);
+if( $type ne 'genelist'){
+	my %properties;
+	say "props";
+} else {
+	my %properties = (
+		url_names  	=>  \@url_names
+	);
+	say "url";
+}
 
 $properties{'strain'}= [split /\s/, $strain] if defined($strain);
 $properties{'sexes'} = [split /\s/, $sexes] if defined($sexes);
@@ -102,6 +115,9 @@ $properties{'cell_types'} = [split /\s/, $cell_types] if defined($cell_types);
 $properties{'hmark'} = [split /\s/, $hmark] if defined($hmark);
 $properties{'repeat'} = [split /\s/, $repeat] if defined($repeat);
 $properties{'peak'} = [split /\s/, $peak] if defined($peak);
+$properties{'methyl'} = [split /\s/, $methyl] if defined($methyl);
+$properties{'genes'} = [split /\s/, $genes] if defined($genes);
+
 
 print STDERR Dumper \%properties;
 print STDERR "====\n";
@@ -139,12 +155,27 @@ if( $type eq 'bedgraph'){
       type => "bedgraph",
       mode => "show",
       colorpositive => "#ff33cc/#B30086",
-      backgroundcolor => "#ffe5ff",
+      backgroundcolor => "#ffffff",
       metadata => { blueprint => [] },
       height => 40,
       group  => 1,
       name   => ''
   };
+}
+
+if( $type eq 'bigwig'){
+	$track_template = {
+		type => "bigwig",
+		mode => "show",
+		colorpositive => "#ff3333/#b30000",
+		colornegative => "#3333ff/#0000b3",
+		fixedscale => {min => -10,max =>10 },
+		backgroundcolor => "#ffffff",
+		metadata => { blueprint => [] },
+		height => 40,
+		group  => 1,
+		name   => ''
+	};
 }
 
 if( $type eq 'hammock' ){
@@ -153,7 +184,29 @@ if( $type eq 'hammock' ){
       mode => "barplot",
       metadata => { blueprint => [] },
       showscoreidx => "0",
-	  scorenamelst => ["signal value", "P value (-log10)","Q value (-log10)"]
+	  scorenamelst => ["signal value", "P value (-log10)","Q value (-log10)"],
+	  name   => ''
+  };
+}
+
+if( $type eq 'bam' ){
+  $track_template = {
+      type => "bam",
+      mode => "density",
+      colorforward => "#FF850A",
+      colorreverse => "#850AFF",
+      colormismatch => "#FFFF00",
+      metadata => { blueprint => [] },
+      name   => ''
+  };
+}
+
+if( $type eq 'geneset' ){
+  $track_template = {
+      type => "geneset",
+      mode => "density",
+      metadata => { blueprint => [] },
+      name   => ''
   };
 }
 
