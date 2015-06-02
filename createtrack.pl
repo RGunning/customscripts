@@ -25,35 +25,34 @@ use JSON;
 use HTTP::Tiny;
 use Storable 'dclone';
 use List::AllUtils qw(uniq);
-use Set::CrossProduct;
+#use Set::CrossProduct;
 use Color::Scheme;
 
-print STDERR Dumper \@ARGV;
+#print STDERR Dumper \@ARGV;
 
 my( $file, $sexes, $assays,$url_names, $base_url, $help, $json_url, $cell_types, $url_suffix, $hmark, $strain, $repeat, $peak, $methyl, $genes);
 my $name_suffix;
 my $colour_by = 'cell_types';
 my $type = 'bedgraph';
-GetOptions( "vocab_url=s"   	=> \$json_url,
-	    "strain=s"		=> \$strain,
+GetOptions( "vocab_url=s"   => \$json_url,
+            "strain=s"		=> \$strain,
             "sexes=s"    	=> \$sexes,
             "cell_types=s" 	=> \$cell_types,
             "assays=s"   	=> \$assays,
             "hmark=s"		=> \$hmark,
             "url_names=s"	=> \$url_names,
             "url_suffix=s" 	=> \$url_suffix,
-            "name_suffix=s" 	=> \$name_suffix,
+            "name_suffix=s" => \$name_suffix,
             "base_url=s" 	=> \$base_url,
             "colour_by=s" 	=> \$colour_by,
-            "type=s"        	=> \$type,
+            "type=s"        => \$type,
             "replicate=s"	=> \$repeat,
             "peak=s"		=> \$peak,
             "methyl=s"		=> \$methyl,
             "genes=s"		=> \$genes,
-            "help" 		=> \$help
+            "help"          => \$help
             )
     or die("Error in command line arguments\n");
-
 
 
 if( $help ){
@@ -85,9 +84,14 @@ my @colour_by = split /\s/, $colour_by;
 # translate strings into arrays
 #my @properties;
 
+my @url_names;
 if( $type ne 'genelist'){
-	my @url_names = map { $_ . $url_suffix } split /\s/, $url_names;
-	say "url names -> array";
+    say "url names -> array";
+    if (defined($url_suffix)){
+        @url_names = map { $_ . $url_suffix } split /\s/, $url_names;
+    } else {
+        @url_names = map { $_ } split /\s/, $url_names;
+    }
 }
 #push @properties, \@url_names;
 #foreach my $input (@inputs){
@@ -98,14 +102,12 @@ if( $type ne 'genelist'){
 print STDERR "Setting Properties:\n";
 
 # SET PROPERTY HASH BASED ON WHAT USER SUPLIES
+my %properties;
 if( $type ne 'genelist'){
-	my %properties;
-	say "props";
-} else {
-	my %properties = (
+	%properties = (
 		url_names  	=>  \@url_names
 	);
-	say "url";
+	say "url set";
 }
 
 $properties{'strain'}= [split /\s/, $strain] if defined($strain);
@@ -117,7 +119,6 @@ $properties{'repeat'} = [split /\s/, $repeat] if defined($repeat);
 $properties{'peak'} = [split /\s/, $peak] if defined($peak);
 $properties{'methyl'} = [split /\s/, $methyl] if defined($methyl);
 $properties{'genes'} = [split /\s/, $genes] if defined($genes);
-
 
 print STDERR Dumper \%properties;
 print STDERR "====\n";
