@@ -74,7 +74,7 @@ if( $type ne 'genelist'){
 	die "url_names not defined"       if ! defined($url_names);
 #	die "url_suffix not defined"       if ! defined($url_suffix);
 	die "url_base not defined"   if ! defined($base_url);
-	say "Setting url names and base url";
+	say STDERR "Setting url names and base url";
 }
 
 my @colour_by = split /\s/, $colour_by;
@@ -86,7 +86,7 @@ my @colour_by = split /\s/, $colour_by;
 
 my @url_names;
 if( $type ne 'genelist'){
-    say "url names -> array";
+    say STDERR "url names -> array";
     if (defined($url_suffix)){
         @url_names = map { $_ . $url_suffix } split /\s/, $url_names;
     } else {
@@ -107,7 +107,7 @@ if( $type ne 'genelist'){
 	%properties = (
 		url_names  	=>  \@url_names
 	);
-	say "url set";
+	say STDERR "url set";
 }
 
 $properties{'strain'}= [split /\s/, $strain] if defined($strain);
