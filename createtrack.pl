@@ -159,7 +159,7 @@ if( $type eq 'bedgraph'){
       backgroundcolor => "#ffffff",
       metadata => { blueprint => [] },
       height => 40,
-      group  => 1,
+#      group  => 1,
       name   => ''
   };
 }
@@ -174,7 +174,7 @@ if( $type eq 'bigwig'){
 		backgroundcolor => "#ffffff",
 		metadata => { blueprint => [] },
 		height => 40,
-		group  => 1,
+        #		group  => 1,
 		name   => ''
 	};
 }
